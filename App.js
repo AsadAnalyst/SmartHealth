@@ -4,6 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Button } from 'react-native-paper';
+import { signOut } from 'firebase/auth';
 
 import AuthScreen from './components/AuthScreen';
 import HomeScreen from './components/HomeScreen';
@@ -27,8 +29,25 @@ function MainTabs() {
       <Tab.Screen name="Food Analyzer" component={FoodAnalyzerScreen} />
       <Tab.Screen name="Tracker" component={TrackerScreen} />
       <Tab.Screen name="Charts" component={ChartsScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Settings">
+        {() => <SettingsScreenWithSignOut />}
+      </Tab.Screen>
     </Tab.Navigator>
+  );
+}
+
+function SettingsScreenWithSignOut() {
+  return (
+    <>
+      <SettingsScreen />
+      <Button
+        mode="contained"
+        style={{ margin: 16, backgroundColor: '#d32f2f' }}
+        onPress={() => signOut(auth)}
+      >
+        Sign Out
+      </Button>
+    </>
   );
 }
 
