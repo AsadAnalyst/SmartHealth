@@ -49,9 +49,12 @@ export default function App() {
   return (
     <PaperProvider>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={user ? 'Main' : 'Auth'}>
-          <Stack.Screen name="Auth" component={AuthScreen} />
-          <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {!user ? (
+            <Stack.Screen name="Auth" component={AuthScreen} />
+          ) : (
+            <Stack.Screen name="Main" component={MainTabs} />
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

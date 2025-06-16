@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, Text, Title, useTheme, Snackbar } from 'react-native-paper';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import * as Google from 'expo-auth-session/providers/google';
 
 export default function AuthScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,6 +13,22 @@ export default function AuthScreen() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const theme = useTheme();
+
+  // Expo Google Auth
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: '444230094713-i640n3e5513i82uqgsitru5sikprb9sp.apps.googleusercontent.com',
+    iosClientId: '444230094713-8a41ph49jgdt6c516tqbdsrlkdvhmr2v.apps.googleusercontent.com',
+    androidClientId: '444230094713-bvkf2q9kpugigoab4k5vj1cpmpjjrntc.apps.googleusercontent.com',
+    webClientId: '444230094713-i640n3e5513i82uqgsitru5sikprb9sp.apps.googleusercontent.com',
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential);
+    }
+  }, [response]);
 
   // Auth logic with Firebase
   const handleAuth = async () => {
@@ -36,18 +53,6 @@ export default function AuthScreen() {
       // TODO: Navigate to main app
     } catch (e) {
       setError(e.message || 'Authentication failed.');
-    }
-  };
-
-  // Google Sign-In (Web only, placeholder for Expo)
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      setError('');
-      // TODO: Navigate to main app
-    } catch (e) {
-      setError(e.message || 'Google Sign-In failed.');
     }
   };
 
@@ -108,7 +113,8 @@ export default function AuthScreen() {
           icon="google"
           mode="outlined"
           style={styles.googleBtn}
-          onPress={handleGoogleSignIn}
+          onPress={() => promptAsync()}
+          disabled={!request}
         >
           Continue with Google
         </Button>
