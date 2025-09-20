@@ -31,7 +31,7 @@ function MainTabs() {
       <Tab.Screen name="Charts" component={ChartsScreen} />
       <Tab.Screen name="Settings">
         {() => <SettingsScreenWithSignOut />}
-      </Tab.Screen1sn1>
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
